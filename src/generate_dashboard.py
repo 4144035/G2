@@ -1,12 +1,17 @@
-"""Interactive HTML Dashboard Generator for Classroom Presentation
+"""Interactive HTML Dashboard & Presentation Generator for Group 2
 
-Generates a standalone, feature-rich, interactive HTML presentation dashboard:
-1. Problem Motivation & Flowchart
-2. Development Process & AI Collaboration (Real Development Experience)
-3. KPI Metric Cards (Revised terminology)
-4. Interactive Dynamic Charts (Chart.js)
-5. Summary Metrics Matrix & Event Explorer (Historical Positive Return Ratio)
-6. Research Limitations & Future Extensions
+Generates a standalone, feature-rich, interactive HTML dashboard & 10-min presentation:
+PART 1: Team & Project Hero/Header
+PART 2: Core Result Dashboard (KPIs, Charts, Summary Matrix, Event Explorer, CSV export)
+PART 3: Corrected Financial Terminology (Historical Positive Return Rate, strictly non-causal)
+PART 4: 01｜Project Motivation & Research Question
+PART 5: 02｜Data Pipeline & Methodology
+PART 6: 03｜AI/Antigravity Development Workflow
+PART 7: 04｜Challenges & Problem-Solving
+PART 8: 05｜Core Findings & Real Data Insights (3 Cards)
+PART 9: 06｜Data Limitations & Disclaimer
+PART 10: Footer & GitHub Repository Link
+
 Saves to outputs/dashboard.html and dashboard.html in project root.
 """
 
@@ -22,7 +27,6 @@ ROOT_HTML_PATH = os.path.join(PROJECT_ROOT, "dashboard.html")
 
 
 def build_dashboard_html() -> str:
-    # Load processed data
     events_path = os.path.join(OUTPUT_TABLES_DIR, "event_details.csv")
     summary_path = os.path.join(OUTPUT_TABLES_DIR, "company_summary.csv")
 
@@ -32,7 +36,6 @@ def build_dashboard_html() -> str:
     events_df = pd.read_csv(events_path)
     summary_df = pd.read_csv(summary_path)
 
-    # Convert data to JSON for embedding
     events_json = events_df.to_json(orient="records")
     summary_json = summary_df.to_json(orient="records")
 
@@ -41,38 +44,46 @@ def build_dashboard_html() -> str:
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>美股半導體財報事件波動分析 ｜ 課堂報告儀表板</title>
+  <title>美股半導體財報事件波動分析工具 ｜ 第二組成果報告</title>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Chart.js CDN -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;700&display=swap');
+    
     body {{
       font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      background-color: #0b1120;
+      background-color: #090d16;
       color: #f1f5f9;
     }}
+    .font-mono-code {{
+      font-family: 'JetBrains Mono', monospace;
+    }}
     .glass-card {{
-      background: rgba(17, 24, 39, 0.75);
-      backdrop-filter: blur(14px);
+      background: rgba(15, 23, 42, 0.78);
+      backdrop-filter: blur(16px);
       border: 1px solid rgba(255, 255, 255, 0.08);
       border-radius: 1rem;
     }}
+    .glass-card-accent {{
+      background: linear-gradient(135deg, rgba(30, 41, 59, 0.7) 0%, rgba(15, 23, 42, 0.85) 100%);
+      border: 1px solid rgba(56, 189, 248, 0.2);
+    }}
     .glass-card-hover:hover {{
-      border-color: rgba(56, 189, 248, 0.35);
+      border-color: rgba(56, 189, 248, 0.4);
       transform: translateY(-2px);
       transition: all 0.2s ease-in-out;
     }}
     .badge-pos {{
       background-color: rgba(16, 185, 129, 0.15);
       color: #34d399;
-      border: 1px solid rgba(16, 185, 129, 0.3);
+      border: 1px solid rgba(16, 185, 129, 0.35);
     }}
     .badge-neg {{
       background-color: rgba(239, 68, 68, 0.15);
       color: #f87171;
-      border: 1px solid rgba(239, 68, 68, 0.3);
+      border: 1px solid rgba(239, 68, 68, 0.35);
     }}
     .badge-neutral {{
       background-color: rgba(148, 163, 184, 0.15);
@@ -85,7 +96,7 @@ def build_dashboard_html() -> str:
       height: 6px;
     }}
     ::-webkit-scrollbar-track {{
-      background: #0b1120;
+      background: #090d16;
     }}
     ::-webkit-scrollbar-thumb {{
       background: #334155;
@@ -104,430 +115,643 @@ def build_dashboard_html() -> str:
     }}
   </style>
 </head>
-<body class="min-h-screen p-4 md:p-8">
-  <div class="max-w-7xl mx-auto space-y-8">
+<body class="min-h-screen p-4 md:p-8 space-y-12">
+  <div class="max-w-7xl mx-auto space-y-12">
     
-    <!-- HEADER -->
-    <header class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-slate-800">
-      <div>
-        <div class="flex flex-wrap items-center gap-2 md:gap-3">
-          <span class="px-3 py-1 text-xs font-bold tracking-wider text-cyan-400 uppercase bg-cyan-950/70 border border-cyan-800 rounded-full">
-            課堂專題報告 (5–8 min)
-          </span>
-          <span class="px-3 py-1 text-xs font-semibold text-slate-300 bg-slate-800 rounded-full border border-slate-700">
-            SEC EDGAR + Yahoo Finance
-          </span>
-          <span class="text-xs text-slate-400">近兩年滾動分析 (2024~2026)</span>
+    <!-- ================================================== -->
+    <!-- PART 1 ｜ 頁面最上方：專案與組別基本資料 Hero Header -->
+    <!-- ================================================== -->
+    <header class="glass-card p-6 md:p-8 border-slate-800 relative overflow-hidden">
+      <div class="absolute -right-20 -top-20 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="absolute -left-20 -bottom-20 w-80 h-80 bg-blue-600/10 rounded-full blur-3xl pointer-events-none"></div>
+
+      <div class="relative z-10 space-y-6">
+        <!-- Top Meta Tags -->
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="px-3.5 py-1 text-xs font-black tracking-widest text-cyan-300 uppercase bg-cyan-950/80 border border-cyan-700/60 rounded-md">
+              第二組
+            </span>
+            <span class="px-3 py-1 text-xs font-semibold text-slate-300 bg-slate-800/90 rounded-md border border-slate-700">
+              美股半導體＋財報日 ｜ SEC EDGAR
+            </span>
+            <span class="text-xs text-slate-400 font-medium">10 分鐘課堂成果報告</span>
+          </div>
+          
+          <div class="flex items-center gap-3">
+            <button onclick="window.print()" class="px-3.5 py-1.5 text-xs font-medium bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg border border-slate-700 transition flex items-center gap-1.5">
+              <span>🖨️</span> 列印 / PDF
+            </button>
+            <a href="tables/event_details.csv" download class="px-3.5 py-1.5 text-xs font-semibold bg-cyan-600 hover:bg-cyan-500 text-white rounded-lg transition shadow-lg shadow-cyan-900/30 flex items-center gap-1.5">
+              <span>📥</span> 下載 CSV 數據
+            </a>
+          </div>
         </div>
-        <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight text-white mt-2">
-          美股半導體財報事件波動分析儀表板
-        </h1>
-        <p class="text-slate-400 text-sm md:text-base mt-1">
-          量化分析 <strong class="text-cyan-400">NVDA</strong>、<strong class="text-cyan-400">AMD</strong>、<strong class="text-cyan-400">INTC</strong>、<strong class="text-cyan-400">QCOM</strong>、<strong class="text-cyan-400">MU</strong> 在 10-Q / 10-K 申報後第 1、3、5 交易日之歷史波動與報酬分佈
-        </p>
-      </div>
-      <div class="flex items-center gap-3">
-        <button onclick="window.print()" class="px-4 py-2 text-xs md:text-sm font-medium bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg border border-slate-700 transition">
-          🖨️ 列印 / 匯出 PDF
-        </button>
-        <a href="tables/event_details.csv" download class="px-4 py-2 text-xs md:text-sm font-medium bg-cyan-600 hover:bg-cyan-500 text-white rounded-lg transition shadow-lg shadow-cyan-900/30">
-          📥 下載 CSV 數據
-        </a>
+
+        <!-- Title and Team -->
+        <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
+          <div class="space-y-1.5">
+            <h1 class="text-3xl md:text-5xl font-black tracking-tight text-white">
+              美股半導體財報事件波動分析工具
+            </h1>
+            <p class="text-slate-400 text-sm md:text-base font-medium tracking-wide">
+              Semiconductor Earnings Event Volatility Dashboard
+            </p>
+          </div>
+
+          <!-- Team Members -->
+          <div class="bg-slate-900/80 px-5 py-3 rounded-xl border border-slate-800 flex flex-wrap items-center gap-4 text-xs">
+            <span class="text-slate-400 font-bold uppercase tracking-wider">組員</span>
+            <div class="flex items-center gap-4 font-mono-code">
+              <span class="text-slate-200 font-semibold">B54144035 <strong class="text-cyan-300 font-sans">張丞伶</strong></span>
+              <span class="text-slate-200 font-semibold">D44126176 <strong class="text-cyan-300 font-sans">賴則維</strong></span>
+              <span class="text-slate-200 font-semibold">E34141133 <strong class="text-cyan-300 font-sans">劉宇博</strong></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Info Badges Bar -->
+        <div class="pt-4 border-t border-slate-800/80 grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+          <div class="bg-slate-900/50 p-2.5 rounded-lg border border-slate-800/60">
+            <span class="text-slate-500 font-medium block">分析標的</span>
+            <span class="text-slate-200 font-bold">NVDA · AMD · INTC · QCOM · MU</span>
+          </div>
+          <div class="bg-slate-900/50 p-2.5 rounded-lg border border-slate-800/60">
+            <span class="text-slate-500 font-medium block">資料來源</span>
+            <span class="text-slate-200 font-bold">SEC EDGAR × Yahoo Finance</span>
+          </div>
+          <div class="bg-slate-900/50 p-2.5 rounded-lg border border-slate-800/60">
+            <span class="text-slate-500 font-medium block">分析期間</span>
+            <span class="text-slate-200 font-bold">近兩年滾動歷史區間</span>
+          </div>
+          <div class="bg-slate-900/50 p-2.5 rounded-lg border border-slate-800/60">
+            <span class="text-slate-500 font-medium block">事件類型</span>
+            <span class="text-slate-200 font-bold">10-Q (季報) / 10-K (年報)</span>
+          </div>
+        </div>
+
       </div>
     </header>
 
-    <!-- SECTION 1: 專案想法與問題意識 -->
-    <section class="glass-card p-6 md:p-8 space-y-6">
-      <div class="flex items-center gap-3">
-        <div class="w-2 h-6 bg-cyan-500 rounded-full"></div>
-        <h2 class="text-xl md:text-2xl font-bold text-white tracking-tight">一、專案想法與問題意識</h2>
-      </div>
 
-      <!-- Core Question Banner -->
-      <div class="bg-gradient-to-r from-cyan-950/60 via-slate-900/80 to-slate-900/40 p-5 rounded-xl border border-cyan-800/50 space-y-2">
-        <div class="text-xs font-bold uppercase tracking-wider text-cyan-400">核心探討問題 (Core Research Question)</div>
-        <div class="text-lg md:text-xl font-semibold text-white leading-relaxed">
-          「半導體公司發布財報後，未來 <span class="text-amber-400 underline decoration-amber-400/50 underline-offset-4">1、3、5 個交易日</span> 通常會移動多大？方向是否存在歷史特徵？」
+    <!-- ================================================== -->
+    <!-- PART 2 ｜ 成果 DASHBOARD (整份頁面的視覺核心) -->
+    <!-- ================================================== -->
+    <section class="space-y-6">
+      
+      <!-- Section Title Badge -->
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-2.5 h-7 bg-cyan-400 rounded-full shadow-lg shadow-cyan-400/50"></div>
+          <h2 class="text-2xl md:text-3xl font-black text-white tracking-tight">成果 Dashboard</h2>
+          <span class="text-xs px-2.5 py-1 bg-cyan-950/60 border border-cyan-800 text-cyan-300 rounded-md font-semibold">
+            即時動態成果展示
+          </span>
         </div>
-        <p class="text-xs md:text-sm text-slate-400 leading-relaxed">
-          半導體產業兼具高資本支出與高景氣循環特性，每逢財報公布常伴隨劇烈的市場重定價。本專案透過自動化數據管道，量化近兩年各標的在財報申報後的絕對價格反應與歷史正負報酬分佈，建立可量化追溯的歷史波動基準。
-        </p>
-      </div>
-
-      <!-- Process Flowchart -->
-      <div>
-        <div class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">資料分析與處理流程 (Pipeline Flowchart)</div>
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
-          
-          <div class="bg-slate-800/80 p-4 rounded-lg border border-slate-700 flex flex-col justify-between">
-            <div>
-              <div class="text-xs text-cyan-400 font-bold mb-1">步驟 1 ｜ 申報資料</div>
-              <div class="text-sm font-semibold text-white">SEC EDGAR 10-Q/10-K</div>
-              <div class="text-xs text-slate-400 mt-1">抓取 5 家公司原始 submissions JSON，篩選近兩年 10-Q/10-K</div>
-            </div>
-            <div class="text-right text-slate-500 font-bold mt-2 text-xs">01 ➔</div>
-          </div>
-
-          <div class="bg-slate-800/80 p-4 rounded-lg border border-slate-700 flex flex-col justify-between">
-            <div>
-              <div class="text-xs text-cyan-400 font-bold mb-1">步驟 2 ｜ 股價資料</div>
-              <div class="text-sm font-semibold text-white">Yahoo Finance 股價</div>
-              <div class="text-xs text-slate-400 mt-1">抓取 626 交易日之日線 Close 序列，涵蓋基準日與 +5D 區間</div>
-            </div>
-            <div class="text-right text-slate-500 font-bold mt-2 text-xs">02 ➔</div>
-          </div>
-
-          <div class="bg-slate-800/80 p-4 rounded-lg border border-slate-700 flex flex-col justify-between">
-            <div>
-              <div class="text-xs text-cyan-400 font-bold mb-1">步驟 3 ｜ 日期對齊</div>
-              <div class="text-sm font-semibold text-white">交易日對齊與基準價</div>
-              <div class="text-xs text-slate-400 mt-1">遇非交易日向後對齊有效交易日；基準價採事件前一交易日收盤價 (T-1)</div>
-            </div>
-            <div class="text-right text-slate-500 font-bold mt-2 text-xs">03 ➔</div>
-          </div>
-
-          <div class="bg-slate-800/80 p-4 rounded-lg border border-slate-700 flex flex-col justify-between">
-            <div>
-              <div class="text-xs text-cyan-400 font-bold mb-1">步驟 4 ｜ 波動計算</div>
-              <div class="text-sm font-semibold text-white">+1D / +3D / +5D 報酬與波動</div>
-              <div class="text-xs text-slate-400 mt-1">依交易日序列計算報酬率與絕對值，缺值嚴格保留為空值不填 0</div>
-            </div>
-            <div class="text-right text-slate-500 font-bold mt-2 text-xs">04 ➔</div>
-          </div>
-
-          <div class="bg-slate-800/80 p-4 rounded-lg border border-cyan-800/80 bg-cyan-950/30 flex flex-col justify-between">
-            <div>
-              <div class="text-xs text-cyan-400 font-bold mb-1">步驟 5 ｜ 橫向比較</div>
-              <div class="text-sm font-semibold text-white">五家公司統計矩陣</div>
-              <div class="text-xs text-slate-400 mt-1">彙總中位數、平均數、歷史正報酬比例與視覺化圖表</div>
-            </div>
-            <div class="text-right text-cyan-400 font-bold mt-2 text-xs">✓ 完成</div>
-          </div>
-
+        <div class="text-xs text-slate-400 hidden sm:block">
+          * 數據基於真實近兩年 40 場 SEC 財報申報事件
         </div>
       </div>
-    </section>
 
-    <!-- SECTION 2: 開發流程與 AI 協作經驗 -->
-    <section class="glass-card p-6 md:p-8 space-y-6">
-      <div class="flex items-center gap-3">
-        <div class="w-2 h-6 bg-purple-500 rounded-full"></div>
-        <h2 class="text-xl md:text-2xl font-bold text-white tracking-tight">二、開發流程與 AI 協作經驗</h2>
-      </div>
-
-      <!-- 4 Collaboration Cards -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        
-        <div class="bg-slate-800/60 p-5 rounded-xl border border-slate-700 space-y-2">
-          <div class="w-8 h-8 rounded-lg bg-blue-500/20 text-blue-400 flex items-center justify-center font-bold text-sm">1</div>
-          <h3 class="text-base font-bold text-white">規劃與需求拷問</h3>
-          <p class="text-xs text-slate-400 leading-relaxed">
-            確立 5 檔標的、鎖定 10-Q/10-K、限定近兩年滾動區間與 T-1 基準價對齊規則；建立 <code>PLAN.md</code> 與 <code>TASK.md</code> 關卡規範。
-          </p>
-        </div>
-
-        <div class="bg-slate-800/60 p-5 rounded-xl border border-slate-700 space-y-2">
-          <div class="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-sm">2</div>
-          <h3 class="text-base font-bold text-white">資料抓取 (Ingestion)</h3>
-          <p class="text-xs text-slate-400 leading-relaxed">
-            克服 SEC EDGAR 的 User-Agent 格式限制（排查 403 阻擋），成功下載 5 檔標的 40 筆原始 JSON 與 626 交易日股價。
-          </p>
-        </div>
-
-        <div class="bg-slate-800/60 p-5 rounded-xl border border-slate-700 space-y-2">
-          <div class="w-8 h-8 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold text-sm">3</div>
-          <h3 class="text-base font-bold text-white">資料整理與計算</h3>
-          <p class="text-xs text-slate-400 leading-relaxed">
-            以純交易日序列推算 +1D、+3D、+5D 價格；計算中位數、平均數與正負報酬次數，產出逐事件明細與彙總表。
-          </p>
-        </div>
-
-        <div class="bg-slate-800/60 p-5 rounded-xl border border-purple-800/80 bg-purple-950/20 space-y-2">
-          <div class="w-8 h-8 rounded-lg bg-purple-500/30 text-purple-300 flex items-center justify-center font-bold text-sm">4</div>
-          <h3 class="text-base font-bold text-white">AI 協作與嚴謹驗收</h3>
-          <p class="text-xs text-slate-400 leading-relaxed">
-            不直接信任 AI 的完成宣告；實作自動化單元測試 (<code>unittest</code>) 與公式反算，雙重核對資料一致性與邊界條件。
-          </p>
-        </div>
-
-      </div>
-
-      <!-- Real Development Reflection Box -->
-      <div class="bg-slate-900/90 p-5 rounded-xl border border-slate-700/80 space-y-2">
-        <div class="flex items-center gap-2 text-xs font-bold text-amber-400 uppercase tracking-wider">
-          <span>💡</span> 真實開發經驗與反思 (Real Development Insight)
-        </div>
-        <p class="text-xs md:text-sm text-slate-300 leading-relaxed">
-          原先專案規劃採「逐 TASK 分階段實作與人工審查」；但在實作時，AI 助理一度一次性建立了完整的端到端 pipeline。為確保資料品質與計算嚴謹性，團隊<strong>並未直接採信 AI 的完成宣告</strong>，而是切換至驗證模式：
-          <br />
-          1. <strong>實際終端機執行</strong>：真實運行 <code>py -3.12 main.py</code> 確認各模組依序跑通；
-          <br />
-          2. <strong>撰寫自動化測試</strong>：透過 <code>tests/test_pipeline.py</code> 抽樣反算 40 場財報事件之報酬率公式；
-          <br />
-          3. <strong>跨表一致性檢查</strong>：確認圖表、彙總表與逐事件原始明細數值 100% 吻合，落實「以驗證代替盲信」的 AI 協作原則。
-        </p>
-      </div>
-    </section>
-
-    <!-- SECTION 3: 核心數據指標 (KPI CARDS) -->
-    <section>
-      <div class="flex items-center gap-3 mb-4">
-        <div class="w-2 h-6 bg-emerald-500 rounded-full"></div>
-        <h2 class="text-xl md:text-2xl font-bold text-white tracking-tight">三、核心指標與重要發現</h2>
-      </div>
-
+      <!-- 1. KPI 摘要卡片 -->
       <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        
         <div class="glass-card p-5 glass-card-hover">
-          <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider">總分析財報事件</div>
-          <div class="text-3xl font-extrabold text-white mt-2">40 <span class="text-sm font-normal text-slate-400">場</span></div>
+          <div class="text-xs font-bold text-slate-400 uppercase tracking-wider">總分析財報事件</div>
+          <div class="text-3xl md:text-4xl font-extrabold text-white mt-2">40 <span class="text-sm font-normal text-slate-400">場</span></div>
           <div class="text-xs text-slate-400 mt-1">5 檔標的 × 各 8 次 (6 次 10-Q + 2 次 10-K)</div>
         </div>
 
         <div class="glass-card p-5 glass-card-hover">
-          <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider">+1D 絕對波動最高</div>
-          <div class="text-3xl font-extrabold text-amber-400 mt-2">INTC <span class="text-lg">7.26%</span></div>
+          <div class="text-xs font-bold text-slate-400 uppercase tracking-wider">+1D 絕對波動最高</div>
+          <div class="text-3xl md:text-4xl font-extrabold text-amber-400 mt-2">INTC <span class="text-xl">7.26%</span></div>
           <div class="text-xs text-slate-400 mt-1">中位數絕對波動 (+5D 達 9.75%)</div>
         </div>
 
         <div class="glass-card p-5 glass-card-hover">
-          <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider">+1D 歷史正報酬比例最高</div>
-          <div class="text-3xl font-extrabold text-emerald-400 mt-2">QCOM <span class="text-lg">75.0%</span></div>
-          <div class="text-xs text-slate-400 mt-1">8 次事件中 6 次 +1D 為正報酬</div>
+          <div class="text-xs font-bold text-slate-400 uppercase tracking-wider">+1D 歷史正報酬比例最高</div>
+          <div class="text-3xl md:text-4xl font-extrabold text-emerald-400 mt-2">QCOM <span class="text-xl">75.0%</span></div>
+          <div class="text-xs text-slate-400 mt-1">近兩年 8 次事件中 6 次 +1D 為正報酬</div>
         </div>
 
         <div class="glass-card p-5 glass-card-hover">
-          <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider">NVDA +3D 歷史現象</div>
-          <div class="text-3xl font-extrabold text-rose-400 mt-2">0.0% <span class="text-sm font-normal text-slate-400">正報酬</span></div>
-          <div class="text-xs text-slate-400 mt-1">近兩年 8 次事件在 +3D 皆為負報酬 (樣本有限)</div>
+          <div class="text-xs font-bold text-slate-400 uppercase tracking-wider">NVDA +3D 歷史現象</div>
+          <div class="text-3xl md:text-4xl font-extrabold text-rose-400 mt-2">0.0% <span class="text-sm font-normal text-slate-400">正報酬</span></div>
+          <div class="text-xs text-slate-400 mt-1">8 次事件在 +3D 均為負 (不代表未來必然下跌)</div>
         </div>
-      </div>
-    </section>
 
-    <!-- SECTION 4: 互動圖表區塊 (INTERACTIVE CHARTS) -->
-    <section class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      
-      <!-- Chart 1: Median Volatility -->
+      </div>
+
+      <!-- 2. 四大互動圖表 (Chart.js) -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        
+        <!-- Chart 1: Median Volatility -->
+        <div class="glass-card p-6">
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <h3 class="text-lg font-bold text-white">五家公司中位數絕對波動比較 (+1D / +3D / +5D)</h3>
+              <p class="text-xs text-slate-400">衡量財報公布後市場的絕對重定價幅度（不分漲跌）</p>
+            </div>
+            <span class="text-xs px-2.5 py-1 bg-slate-800 rounded font-semibold text-slate-300 font-mono-code">%</span>
+          </div>
+          <div class="h-72">
+            <canvas id="chartVolatility"></canvas>
+          </div>
+        </div>
+
+        <!-- Chart 2: Positive Return Ratio -->
+        <div class="glass-card p-6">
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <h3 class="text-lg font-bold text-white">歷史正報酬比例比較 (Historical Positive Return Rate)</h3>
+              <p class="text-xs text-slate-400">近兩年各天期正報酬事件次數比例（紅虛線為 50% 基準線，非未來機率）</p>
+            </div>
+            <span class="text-xs px-2.5 py-1 bg-slate-800 rounded font-semibold text-slate-300 font-mono-code">基準: 50%</span>
+          </div>
+          <div class="h-72">
+            <canvas id="chartWinRate"></canvas>
+          </div>
+        </div>
+
+        <!-- Chart 3: Mean Return -->
+        <div class="glass-card p-6">
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <h3 class="text-lg font-bold text-white">平均報酬率比較 (+1D / +3D / +5D)</h3>
+              <p class="text-xs text-slate-400">反映歷史樣本在各天期之方向性平均幅度</p>
+            </div>
+            <span class="text-xs px-2.5 py-1 bg-slate-800 rounded font-semibold text-slate-300 font-mono-code">%</span>
+          </div>
+          <div class="h-72">
+            <canvas id="chartMeanReturn"></canvas>
+          </div>
+        </div>
+
+        <!-- Chart 4: Interactive Trajectory Simulator -->
+        <div class="glass-card p-6">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+            <div>
+              <h3 class="text-lg font-bold text-white">個別財報事件軌跡 (+1D → +3D → +5D)</h3>
+              <p class="text-xs text-slate-400">點選切換檢視個別公司每場財報公布後的走勢演變</p>
+            </div>
+            <select id="trajectorySymbolSelect" class="bg-slate-800 border border-slate-700 text-xs text-slate-200 rounded-lg px-3 py-1.5 focus:outline-none focus:border-cyan-500 font-semibold">
+              <option value="ALL">全部標的走勢彙總</option>
+              <option value="NVDA">NVDA (NVIDIA)</option>
+              <option value="AMD">AMD</option>
+              <option value="INTC">INTC (Intel)</option>
+              <option value="QCOM">QCOM (Qualcomm)</option>
+              <option value="MU">MU (Micron)</option>
+            </select>
+          </div>
+          <div class="h-72">
+            <canvas id="chartTrajectory"></canvas>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- 3. 五家公司統計矩陣 (Summary Matrix Table) -->
       <div class="glass-card p-6">
         <div class="flex items-center justify-between mb-4">
           <div>
-            <h2 class="text-lg font-bold text-white">各公司絕對波動度比較 (中位數)</h2>
-            <p class="text-xs text-slate-400">衡量財報公布後市場的絕對重定價幅度</p>
+            <h3 class="text-lg font-bold text-white">五家公司完整統計矩陣</h3>
+            <p class="text-xs text-slate-400">各標的在 +1D、+3D、+5D 之波動、報酬與正負次數統計</p>
           </div>
-          <span class="text-xs px-2 py-1 bg-slate-800 rounded text-slate-300">單位: %</span>
         </div>
-        <div class="h-72">
-          <canvas id="chartVolatility"></canvas>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-sm text-slate-300">
+            <thead class="text-xs uppercase bg-slate-800/90 text-slate-400 border-b border-slate-700">
+              <tr>
+                <th class="px-4 py-3 font-semibold">股票代碼</th>
+                <th class="px-4 py-3 font-semibold">天期</th>
+                <th class="px-4 py-3 font-semibold text-right">中位數絕對波動</th>
+                <th class="px-4 py-3 font-semibold text-right">平均報酬率</th>
+                <th class="px-4 py-3 font-semibold text-right">中位數報酬率</th>
+                <th class="px-4 py-3 font-semibold text-center">正 / 負次數</th>
+                <th class="px-4 py-3 font-semibold text-right">歷史正報酬比例</th>
+                <th class="px-4 py-3 font-semibold text-right">歷史最大漲幅</th>
+                <th class="px-4 py-3 font-semibold text-right">歷史最大跌幅</th>
+              </tr>
+            </thead>
+            <tbody id="summaryTableBody" class="divide-y divide-slate-800 text-xs md:text-sm">
+              <!-- Rendered by JS -->
+            </tbody>
+          </table>
         </div>
       </div>
 
-      <!-- Chart 2: Positive Return Ratio (Win Rate) -->
+      <!-- 4. Event Explorer (逐事件明細篩選器) -->
       <div class="glass-card p-6">
-        <div class="flex items-center justify-between mb-4">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
           <div>
-            <h2 class="text-lg font-bold text-white">財報後歷史上漲比例對比 (Positive Return Ratio)</h2>
-            <p class="text-xs text-slate-400">歷史正報酬次數佔比 (紅虛線為 50% 多空分界，非未來機率)</p>
+            <h3 class="text-xl font-bold text-white">Event Explorer ｜ 逐事件明細搜尋器</h3>
+            <p class="text-xs text-slate-400 mt-0.5">點擊表頭可排序，支援公司、申報表 (10-Q/10-K) 與關鍵字即時篩選</p>
           </div>
-          <span class="text-xs px-2 py-1 bg-slate-800 rounded text-slate-300">基準: 50%</span>
+          <div class="flex flex-wrap items-center gap-3">
+            <!-- Filter Symbol -->
+            <select id="filterSymbol" class="bg-slate-800 border border-slate-700 text-xs text-slate-200 rounded-lg px-3 py-2 focus:outline-none focus:border-cyan-500 font-semibold">
+              <option value="">所有股票 (All Symbols)</option>
+              <option value="NVDA">NVDA</option>
+              <option value="AMD">AMD</option>
+              <option value="INTC">INTC</option>
+              <option value="QCOM">QCOM</option>
+              <option value="MU">MU</option>
+            </select>
+            <!-- Filter Form -->
+            <select id="filterForm" class="bg-slate-800 border border-slate-700 text-xs text-slate-200 rounded-lg px-3 py-2 focus:outline-none focus:border-cyan-500 font-semibold">
+              <option value="">所有申報類型 (All Forms)</option>
+              <option value="10-Q">10-Q (季報)</option>
+              <option value="10-K">10-K (年報)</option>
+            </select>
+            <!-- Search Input -->
+            <input type="text" id="filterSearch" placeholder="搜尋日期、公司代碼..." class="bg-slate-800 border border-slate-700 text-xs text-slate-200 rounded-lg px-3 py-2 w-48 focus:outline-none focus:border-cyan-500" />
+          </div>
         </div>
-        <div class="h-72">
-          <canvas id="chartWinRate"></canvas>
-        </div>
-      </div>
 
-      <!-- Chart 3: Mean Return -->
-      <div class="glass-card p-6">
-        <div class="flex items-center justify-between mb-4">
-          <div>
-            <h2 class="text-lg font-bold text-white">各天期平均報酬率 (+1D / +3D / +5D)</h2>
-            <p class="text-xs text-slate-400">反映整體方向性歷史平均值</p>
-          </div>
-          <span class="text-xs px-2 py-1 bg-slate-800 rounded text-slate-300">單位: %</span>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-sm text-slate-300">
+            <thead class="text-xs uppercase bg-slate-800/90 text-slate-400 border-b border-slate-700">
+              <tr>
+                <th class="px-4 py-3 font-semibold">標的</th>
+                <th class="px-4 py-3 font-semibold">申報表</th>
+                <th class="px-4 py-3 font-semibold">SEC 申報日</th>
+                <th class="px-4 py-3 font-semibold">有效交易日</th>
+                <th class="px-4 py-3 font-semibold text-right">基準價 (T-1)</th>
+                <th class="px-4 py-3 font-semibold text-right">+1D 報酬</th>
+                <th class="px-4 py-3 font-semibold text-right">+3D 報酬</th>
+                <th class="px-4 py-3 font-semibold text-right">+5D 報酬</th>
+                <th class="px-4 py-3 font-semibold text-right">+5D 絕對波動</th>
+              </tr>
+            </thead>
+            <tbody id="eventsTableBody" class="divide-y divide-slate-800 font-mono-code text-xs">
+              <!-- Rendered by JS -->
+            </tbody>
+          </table>
         </div>
-        <div class="h-72">
-          <canvas id="chartMeanReturn"></canvas>
-        </div>
-      </div>
-
-      <!-- Chart 4: Interactive Trajectory Simulator -->
-      <div class="glass-card p-6">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
-          <div>
-            <h2 class="text-lg font-bold text-white">個別財報事件走勢軌跡 (+1D → +5D)</h2>
-            <p class="text-xs text-slate-400">點選標的切換單一公司的各場事件走勢曲線</p>
-          </div>
-          <select id="trajectorySymbolSelect" class="bg-slate-800 border border-slate-700 text-xs text-slate-200 rounded px-3 py-1.5 focus:outline-none focus:border-cyan-500">
-            <option value="ALL">全部標的彙總</option>
-            <option value="NVDA">NVDA (NVIDIA)</option>
-            <option value="AMD">AMD</option>
-            <option value="INTC">INTC (Intel)</option>
-            <option value="QCOM">QCOM (Qualcomm)</option>
-            <option value="MU">MU (Micron)</option>
-          </select>
-        </div>
-        <div class="h-72">
-          <canvas id="chartTrajectory"></canvas>
+        <div id="noEventsMessage" class="hidden text-center py-8 text-slate-500 text-sm">
+          查無符合條件的財報事件。
         </div>
       </div>
 
     </section>
 
-    <!-- SECTION 5: 彙總統計矩陣表 (SUMMARY TABLE) -->
-    <section class="glass-card p-6">
-      <div class="flex items-center justify-between mb-4">
-        <div>
-          <h2 class="text-lg font-bold text-white">五大半導體指標股彙總統計矩陣</h2>
-          <p class="text-xs text-slate-400">近兩年歷史 10-Q / 10-K 申報後反應總覽</p>
-        </div>
-      </div>
-      <div class="overflow-x-auto">
-        <table class="w-full text-left text-sm text-slate-300">
-          <thead class="text-xs uppercase bg-slate-800/80 text-slate-400 border-b border-slate-700">
-            <tr>
-              <th class="px-4 py-3 font-semibold">股票代碼</th>
-              <th class="px-4 py-3 font-semibold">天期</th>
-              <th class="px-4 py-3 font-semibold text-right">絕對波動 (中位數)</th>
-              <th class="px-4 py-3 font-semibold text-right">平均報酬率</th>
-              <th class="px-4 py-3 font-semibold text-right">中位數報酬率</th>
-              <th class="px-4 py-3 font-semibold text-center">漲 / 跌次數</th>
-              <th class="px-4 py-3 font-semibold text-right">歷史上漲比例</th>
-              <th class="px-4 py-3 font-semibold text-right">歷史最大漲幅</th>
-              <th class="px-4 py-3 font-semibold text-right">歷史最大跌幅</th>
-            </tr>
-          </thead>
-          <tbody id="summaryTableBody" class="divide-y divide-slate-800">
-            <!-- Rendered by JavaScript -->
-          </tbody>
-        </table>
-      </div>
-    </section>
 
-    <!-- SECTION 6: 逐事件明細搜尋器 (EVENT EXPLORER) -->
-    <section class="glass-card p-6">
-      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-        <div>
-          <h2 class="text-xl font-bold text-white">財報事件詳細明細搜尋器 (Event Explorer)</h2>
-          <p class="text-xs text-slate-400 mt-0.5">點擊表頭可排序，支援公司、申報類別與日期搜尋</p>
-        </div>
-        <div class="flex flex-wrap items-center gap-3">
-          <!-- Filter Symbol -->
-          <select id="filterSymbol" class="bg-slate-800 border border-slate-700 text-xs text-slate-200 rounded-lg px-3 py-2 focus:outline-none focus:border-cyan-500">
-            <option value="">所有股票 (All Symbols)</option>
-            <option value="NVDA">NVDA</option>
-            <option value="AMD">AMD</option>
-            <option value="INTC">INTC</option>
-            <option value="QCOM">QCOM</option>
-            <option value="MU">MU</option>
-          </select>
-          <!-- Filter Form -->
-          <select id="filterForm" class="bg-slate-800 border border-slate-700 text-xs text-slate-200 rounded-lg px-3 py-2 focus:outline-none focus:border-cyan-500">
-            <option value="">所有表格 (All Forms)</option>
-            <option value="10-Q">10-Q (季報)</option>
-            <option value="10-K">10-K (年報)</option>
-          </select>
-          <!-- Search Input -->
-          <input type="text" id="filterSearch" placeholder="搜尋日期或關鍵字..." class="bg-slate-800 border border-slate-700 text-xs text-slate-200 rounded-lg px-3 py-2 w-44 focus:outline-none focus:border-cyan-500" />
-        </div>
-      </div>
-
-      <div class="overflow-x-auto">
-        <table class="w-full text-left text-sm text-slate-300">
-          <thead class="text-xs uppercase bg-slate-800/80 text-slate-400 border-b border-slate-700">
-            <tr>
-              <th class="px-4 py-3 font-semibold">標的</th>
-              <th class="px-4 py-3 font-semibold">Form</th>
-              <th class="px-4 py-3 font-semibold">SEC 申報日</th>
-              <th class="px-4 py-3 font-semibold">有效交易日</th>
-              <th class="px-4 py-3 font-semibold text-right">基準價 (T-1)</th>
-              <th class="px-4 py-3 font-semibold text-right">+1D 報酬</th>
-              <th class="px-4 py-3 font-semibold text-right">+3D 報酬</th>
-              <th class="px-4 py-3 font-semibold text-right">+5D 報酬</th>
-              <th class="px-4 py-3 font-semibold text-right">+5D 絕對波動</th>
-            </tr>
-          </thead>
-          <tbody id="eventsTableBody" class="divide-y divide-slate-800 font-mono text-xs">
-            <!-- Rendered by JavaScript -->
-          </tbody>
-        </table>
-      </div>
-      <div id="noEventsMessage" class="hidden text-center py-8 text-slate-500 text-sm">
-        查無符合條件的財報事件。
-      </div>
-    </section>
-
-    <!-- SECTION 7: 限制與未來擴充 -->
+    <!-- ================================================== -->
+    <!-- PART 4 ｜ 01｜專案想法：我們為什麼做這個工具？ -->
+    <!-- ================================================== -->
     <section class="glass-card p-6 md:p-8 space-y-6">
       <div class="flex items-center gap-3">
-        <div class="w-2 h-6 bg-rose-500 rounded-full"></div>
-        <h2 class="text-xl md:text-2xl font-bold text-white tracking-tight">四、研究限制與未來擴充</h2>
+        <div class="w-2.5 h-7 bg-blue-500 rounded-full shadow-lg shadow-blue-500/50"></div>
+        <h2 class="text-2xl font-black text-white tracking-tight">01 ｜ 專案想法：我們為什麼做這個工具？</h2>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div class="space-y-4 text-slate-300 text-sm md:text-base leading-relaxed">
+        <p>
+          財報公布是股票市場的重要事件，不同半導體公司的股價反應可能存在明顯差異。
+        </p>
+        <p>
+          因此我們希望建立一個可以自動抓取資料並分析的工具，結合 SEC 官方財報申報資料與歷史股價，觀察五家美國半導體公司在財報事件後的短期市場反應。
+        </p>
+      </div>
+
+      <!-- Core Question Highlight Box -->
+      <div class="glass-card-accent p-6 rounded-xl border border-cyan-500/30 text-center space-y-2">
+        <div class="text-xs font-bold uppercase tracking-widest text-cyan-400">核心問題 (Core Research Question)</div>
+        <div class="text-lg md:text-2xl font-black text-white leading-snug">
+          「NVDA、AMD、INTC、QCOM、MU 發布財報後，<br />
+          <span class="text-amber-400">未來 1、3、5 個交易日通常會移動多大？</span>
+          是否存在值得觀察的歷史特徵？」
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ================================================== -->
+    <!-- PART 5 ｜ 02｜資料與方法 -->
+    <!-- ================================================== -->
+    <section class="glass-card p-6 md:p-8 space-y-6">
+      <div class="flex items-center gap-3">
+        <div class="w-2.5 h-7 bg-cyan-500 rounded-full shadow-lg shadow-cyan-500/50"></div>
+        <h2 class="text-2xl font-black text-white tracking-tight">02 ｜ 資料與方法</h2>
+      </div>
+
+      <!-- Visual Pipeline Flow -->
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 text-center">
         
-        <!-- Left: Limitations -->
-        <div class="bg-rose-950/20 p-5 rounded-xl border border-rose-900/40 space-y-3">
-          <div class="flex items-center gap-2 text-sm font-bold text-rose-300 uppercase tracking-wider">
-            <span>⚠️</span> 目前研究限制 (Research Limitations)
-          </div>
-          <ul class="list-disc list-inside space-y-2 text-xs md:text-sm text-slate-300 leading-relaxed">
-            <li>
-              <strong>申報日期非公布時間戳</strong>：SEC <code>filingDate</code> 為官方收件日期，部分公司於盤後發布新聞稿而於隔日申報，存在微小時間差。
-            </li>
-            <li>
-              <strong>未區分盤前 / 盤後公告</strong>：第一版模型未細分盤前、盤中或盤後發布，均統一對齊當日或次一交易日。
-            </li>
-            <li>
-              <strong>樣本數有限</strong>：每家公司近兩年約僅有 8 次申報事件（合計 40 筆），統計結果屬於探索性歷史觀察，不具長期統計顯著性定論。
-            </li>
-            <li>
-              <strong>資料來源限制</strong>：Yahoo Finance 價格資料為公開調整後價格，並非官方交易所逐筆直連數據源。
-            </li>
-            <li>
-              <strong>歷史比例 ≠ 未來機率</strong>：歷史上漲比例僅反映過去兩年統計現象，嚴禁直接推論為未來交易勝率或投資建議。
-            </li>
-          </ul>
+        <div class="bg-slate-800/80 p-4 rounded-xl border border-slate-700 flex flex-col justify-between">
+          <div class="text-xs text-cyan-400 font-bold">資料源 ①</div>
+          <div class="text-sm font-black text-white mt-1">SEC EDGAR</div>
+          <div class="text-xs text-slate-400 mt-1 font-mono-code">10-Q / 10-K</div>
+          <div class="text-slate-500 font-bold text-xs mt-2">➔</div>
         </div>
 
-        <!-- Right: Future Extensions -->
-        <div class="bg-cyan-950/20 p-5 rounded-xl border border-cyan-900/40 space-y-3">
-          <div class="flex items-center gap-2 text-sm font-bold text-cyan-300 uppercase tracking-wider">
-            <span>🚀</span> 未來擴充方向 (Future Extensions)
+        <div class="bg-slate-800/80 p-4 rounded-xl border border-slate-700 flex flex-col justify-between">
+          <div class="text-xs text-cyan-400 font-bold">定位事件</div>
+          <div class="text-sm font-black text-white mt-1">取得 filingDate</div>
+          <div class="text-xs text-slate-400 mt-1">官方申報日</div>
+          <div class="text-slate-500 font-bold text-xs mt-2">➔</div>
+        </div>
+
+        <div class="bg-slate-800/80 p-4 rounded-xl border border-slate-700 flex flex-col justify-between">
+          <div class="text-xs text-cyan-400 font-bold">資料源 ②</div>
+          <div class="text-sm font-black text-white mt-1">Yahoo Finance</div>
+          <div class="text-xs text-slate-400 mt-1">歷史日線股價</div>
+          <div class="text-slate-500 font-bold text-xs mt-2">➔</div>
+        </div>
+
+        <div class="bg-slate-800/80 p-4 rounded-xl border border-slate-700 flex flex-col justify-between">
+          <div class="text-xs text-cyan-400 font-bold">對齊規則</div>
+          <div class="text-sm font-black text-white mt-1">交易日對齊</div>
+          <div class="text-xs text-slate-400 mt-1">T-1 基準收盤價</div>
+          <div class="text-slate-500 font-bold text-xs mt-2">➔</div>
+        </div>
+
+        <div class="bg-slate-800/80 p-4 rounded-xl border border-slate-700 flex flex-col justify-between">
+          <div class="text-xs text-cyan-400 font-bold">波動計算</div>
+          <div class="text-sm font-black text-white mt-1">+1D / +3D / +5D</div>
+          <div class="text-xs text-slate-400 mt-1">報酬與絕對波動</div>
+          <div class="text-slate-500 font-bold text-xs mt-2">➔</div>
+        </div>
+
+        <div class="bg-cyan-950/40 p-4 rounded-xl border border-cyan-700/60 flex flex-col justify-between">
+          <div class="text-xs text-cyan-300 font-bold">分析產出</div>
+          <div class="text-sm font-black text-white mt-1">五家公司比較</div>
+          <div class="text-xs text-cyan-400 mt-1">統計矩陣 & 圖表</div>
+          <div class="text-cyan-400 font-bold text-xs mt-2">✓ 完成</div>
+        </div>
+
+      </div>
+
+      <!-- Overview Info -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+        <div class="bg-slate-900/60 p-4 rounded-lg border border-slate-800">
+          <span class="text-xs font-bold uppercase tracking-wider text-cyan-400 block mb-1">分析標的</span>
+          <span class="text-sm font-semibold text-slate-200">NVDA (NVIDIA)、AMD、INTC (Intel)、QCOM (Qualcomm)、MU (Micron)</span>
+        </div>
+        <div class="bg-slate-900/60 p-4 rounded-lg border border-slate-800">
+          <span class="text-xs font-bold uppercase tracking-wider text-cyan-400 block mb-1">主要分析指標</span>
+          <span class="text-sm font-semibold text-slate-200">報酬率 (%) · 絕對波動 (%) · 中位數 · 平均數 · 歷史正報酬比例</span>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ================================================== -->
+    <!-- PART 6 ｜ 03｜我們怎麼把工具做出來？ -->
+    <!-- ================================================== -->
+    <section class="glass-card p-6 md:p-8 space-y-6">
+      <div class="flex items-center gap-3">
+        <div class="w-2.5 h-7 bg-purple-500 rounded-full shadow-lg shadow-purple-500/50"></div>
+        <h2 class="text-2xl font-black text-white tracking-tight">03 ｜ 我們怎麼把工具做出來？</h2>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        
+        <div class="bg-slate-800/60 p-5 rounded-xl border border-slate-700 space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-purple-400 uppercase">步驟 1</span>
+            <span class="w-6 h-6 rounded-full bg-purple-900/60 text-purple-300 flex items-center justify-center font-bold text-xs">1</span>
           </div>
-          <ul class="list-disc list-inside space-y-2 text-xs md:text-sm text-slate-300 leading-relaxed">
-            <li>
-              <strong>引入精準公告時間戳 (Timestamp)</strong>：串接財經新聞或專業數據源，精準定位到「分/秒」之發布時刻。
-            </li>
-            <li>
-              <strong>區分盤前 / 盤後並動態調整基準日</strong>：盤後公告以當日收盤為 T-1 基準，盤前公告以前一交易日收盤為基準。
-            </li>
-            <li>
-              <strong>延長回測期間至 5~10 年</strong>：擴大歷史樣本量至數十場事件，提升樣本統計穩健度。
-            </li>
-            <li>
-              <strong>納入 EPS / Revenue Surprise 分析</strong>：結合市場預期差值（Consensus Estimate），分析超越預期幅度與波動的相關性。
-            </li>
-            <li>
-              <strong>擴充產業鏈指標股</strong>：納入晶圓代工龍頭 (TSM)、設備龍頭 (ASML)、網通晶片 (AVGO) 等更多半導體權值標的。
-            </li>
-          </ul>
+          <h3 class="text-base font-bold text-white">① 需求拷問與 PLAN</h3>
+          <p class="text-xs md:text-sm text-slate-400 leading-relaxed">
+            先確定股票、資料來源、事件定義、分析期間、輸出方式與驗收條件。
+          </p>
+        </div>
+
+        <div class="bg-slate-800/60 p-5 rounded-xl border border-slate-700 space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-blue-400 uppercase">步驟 2</span>
+            <span class="w-6 h-6 rounded-full bg-blue-900/60 text-blue-300 flex items-center justify-center font-bold text-xs">2</span>
+          </div>
+          <h3 class="text-base font-bold text-white">② Python / 資料抓取</h3>
+          <p class="text-xs md:text-sm text-slate-400 leading-relaxed">
+            利用 Python 從 SEC EDGAR 取得 10-Q / 10-K filing，並取得 Yahoo Finance 歷史股價。
+          </p>
+        </div>
+
+        <div class="bg-slate-800/60 p-5 rounded-xl border border-slate-700 space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-cyan-400 uppercase">步驟 3</span>
+            <span class="w-6 h-6 rounded-full bg-cyan-900/60 text-cyan-300 flex items-center justify-center font-bold text-xs">3</span>
+          </div>
+          <h3 class="text-base font-bold text-white">③ Antigravity 實作</h3>
+          <p class="text-xs md:text-sm text-slate-400 leading-relaxed">
+            使用 Antigravity 協助建立資料清理、事件分析、視覺化與測試流程。
+          </p>
+        </div>
+
+        <div class="bg-slate-800/60 p-5 rounded-xl border border-slate-700 space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-emerald-400 uppercase">步驟 4</span>
+            <span class="w-6 h-6 rounded-full bg-emerald-900/60 text-emerald-300 flex items-center justify-center font-bold text-xs">4</span>
+          </div>
+          <h3 class="text-base font-bold text-white">④ 測試與驗收</h3>
+          <p class="text-xs md:text-sm text-slate-400 leading-relaxed">
+            實際執行 pipeline，並透過測試、CSV 與視覺化結果確認資料與計算是否正常。
+          </p>
         </div>
 
       </div>
     </section>
 
-    <!-- FOOTER -->
-    <footer class="pt-6 pb-8 border-t border-slate-800 text-center text-xs text-slate-500 space-y-1">
-      <div>美股半導體財報事件波動分析專題 ｜ 課堂簡報儀表板</div>
-      <div>本專案僅供學術與量化研究參考，不構成任何投資建議。</div>
+
+    <!-- ================================================== -->
+    <!-- PART 7 ｜ 04｜遇到什麼問題？ -->
+    <!-- ================================================== -->
+    <section class="glass-card p-6 md:p-8 space-y-6">
+      <div class="flex items-center gap-3">
+        <div class="w-2.5 h-7 bg-amber-500 rounded-full shadow-lg shadow-amber-500/50"></div>
+        <h2 class="text-2xl font-black text-white tracking-tight">04 ｜ 遇到什麼問題？</h2>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+        
+        <!-- Problem 1 -->
+        <div class="bg-slate-900/80 p-5 rounded-xl border border-slate-800 space-y-3">
+          <div class="space-y-1">
+            <span class="text-xs font-black text-rose-400 uppercase tracking-wider">Problem 1 ｜ 執行步驟偏差</span>
+            <p class="text-sm font-semibold text-slate-200">
+              原本規劃按照 TASK 一步一步開發，但第一次交給 Antigravity 實作後，AI 直接建立了完整 pipeline。
+            </p>
+          </div>
+          <div class="pt-2 border-t border-slate-800 space-y-1">
+            <span class="text-xs font-black text-emerald-400 uppercase tracking-wider">Solution ｜ 嚴格驗收</span>
+            <p class="text-xs md:text-sm text-slate-400 leading-relaxed">
+              我們沒有直接把「AI 顯示完成」當作成功，而是重新透過實際執行、單元測試、CSV 與圖表結果進行驗收。
+            </p>
+          </div>
+        </div>
+
+        <!-- Problem 2 -->
+        <div class="bg-slate-900/80 p-5 rounded-xl border border-slate-800 space-y-3">
+          <div class="space-y-1">
+            <span class="text-xs font-black text-rose-400 uppercase tracking-wider">Problem 2 ｜ 非交易日對齊</span>
+            <p class="text-sm font-semibold text-slate-200">
+              SEC filingDate 與股票交易日不一定直接對應，例如週末或非交易日。
+            </p>
+          </div>
+          <div class="pt-2 border-t border-slate-800 space-y-1">
+            <span class="text-xs font-black text-emerald-400 uppercase tracking-wider">Solution ｜ 交易日序列對齊</span>
+            <p class="text-xs md:text-sm text-slate-400 leading-relaxed">
+              將事件日期與實際交易日資料進行對齊，再計算事件後 +1D / +3D / +5D。
+            </p>
+          </div>
+        </div>
+
+        <!-- Problem 3 -->
+        <div class="bg-slate-900/80 p-5 rounded-xl border border-slate-800 space-y-3">
+          <div class="space-y-1">
+            <span class="text-xs font-black text-rose-400 uppercase tracking-wider">Problem 3 ｜ SEC 限制</span>
+            <p class="text-sm font-semibold text-slate-200">
+              SEC EDGAR API 初始請求時因 User-Agent Email 格式包含符號遭伺服器 HTTP 403 阻擋。
+            </p>
+          </div>
+          <div class="pt-2 border-t border-slate-800 space-y-1">
+            <span class="text-xs font-black text-emerald-400 uppercase tracking-wider">Solution ｜ 合規 Header</span>
+            <p class="text-xs md:text-sm text-slate-400 leading-relaxed">
+              依據 SEC 官方規範調整合規格式之 User-Agent Header，順利通過 API 驗證。
+            </p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+
+    <!-- ================================================== -->
+    <!-- PART 8 ｜ 05｜我們發現了什麼？ (3 個核心 Insight Cards) -->
+    <!-- ================================================== -->
+    <section class="glass-card p-6 md:p-8 space-y-6">
+      <div class="flex items-center gap-3">
+        <div class="w-2.5 h-7 bg-emerald-500 rounded-full shadow-lg shadow-emerald-500/50"></div>
+        <h2 class="text-2xl font-black text-white tracking-tight">05 ｜ 我們發現了什麼？</h2>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        
+        <!-- Insight 1: INTC & AMD Volatility -->
+        <div class="bg-slate-900/90 p-6 rounded-xl border border-slate-800 flex flex-col justify-between space-y-4">
+          <div class="space-y-2">
+            <div class="text-xs font-bold uppercase tracking-wider text-amber-400">發現 ① ｜ 典型短期波動最大</div>
+            <h3 class="text-lg font-bold text-white">INTC 與 AMD 財報後震盪最劇烈</h3>
+            <p class="text-xs md:text-sm text-slate-300 leading-relaxed">
+              在公布後首個交易日 (+1D)，<strong>INTC</strong> 中位數絕對波動達 <span class="text-amber-400 font-bold">7.26%</span>（+5D 達 9.75%），<strong>AMD</strong> 達 <span class="text-amber-400 font-bold">6.73%</span>（+5D 達 10.16%）。INTC 於 +5D 歷史最大單次震盪高達 +41.48% 與 -19.13%，市場重定價幅度在 5 家中最高。
+            </p>
+          </div>
+          <div class="bg-slate-800/80 px-3.5 py-2 rounded-lg text-xs font-mono-code text-slate-300">
+            INTC +1D: 7.26% ｜ AMD +1D: 6.73%
+          </div>
+        </div>
+
+        <!-- Insight 2: QCOM Positive Ratio -->
+        <div class="bg-slate-900/90 p-6 rounded-xl border border-slate-800 flex flex-col justify-between space-y-4">
+          <div class="space-y-2">
+            <div class="text-xs font-bold uppercase tracking-wider text-emerald-400">發現 ② ｜ 首日歷史正報酬比例</div>
+            <h3 class="text-lg font-bold text-white">QCOM +1D 呈現較高正報酬比例</h3>
+            <p class="text-xs md:text-sm text-slate-300 leading-relaxed">
+              近兩年 8 次財報事件中，<strong>QCOM</strong> 有 6 次在 +1D 報酬為正，歷史正報酬比例為 <span class="text-emerald-400 font-bold">75%</span>（+1D 平均報酬率為 +1.23%）。此為歷史樣本之客觀描述，不代表未來必然上漲。
+            </p>
+          </div>
+          <div class="bg-slate-800/80 px-3.5 py-2 rounded-lg text-xs font-mono-code text-slate-300">
+            QCOM +1D 歷史正報酬比例: 75% (6/8 次)
+          </div>
+        </div>
+
+        <!-- Insight 3: NVDA +3D Phenomenon -->
+        <div class="bg-slate-900/90 p-6 rounded-xl border border-slate-800 flex flex-col justify-between space-y-4">
+          <div class="space-y-2">
+            <div class="text-xs font-bold uppercase tracking-wider text-rose-400">發現 ③ ｜ 樣本歷史特殊現象</div>
+            <h3 class="text-lg font-bold text-white">NVDA +3D 在樣本中皆為負報酬</h3>
+            <p class="text-xs md:text-sm text-slate-300 leading-relaxed">
+              近兩年樣本中，<strong>NVDA</strong> 的 8 次財報事件在 +3D 均呈現負報酬，歷史正報酬比例為 <span class="text-rose-400 font-bold">0%</span>（中位數報酬率 -2.92%）。此結果為樣本期間內的歷史描述，樣本數有限，不代表未來必然下跌。
+            </p>
+          </div>
+          <div class="bg-slate-800/80 px-3.5 py-2 rounded-lg text-xs font-mono-code text-slate-300">
+            NVDA +3D 歷史正報酬比例: 0% (0/8 次)
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+
+    <!-- ================================================== -->
+    <!-- PART 9 ｜ 06｜資料限制 -->
+    <!-- ================================================== -->
+    <section class="glass-card p-6 md:p-8 space-y-6">
+      <div class="flex items-center gap-3">
+        <div class="w-2.5 h-7 bg-rose-500 rounded-full shadow-lg shadow-rose-500/50"></div>
+        <h2 class="text-2xl font-black text-white tracking-tight">06 ｜ 資料限制</h2>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        
+        <div class="bg-slate-900/70 p-4 rounded-xl border border-slate-800 flex items-start gap-3">
+          <span class="text-rose-400 font-bold text-base mt-0.5">1.</span>
+          <p class="text-xs md:text-sm text-slate-300 leading-relaxed">
+            SEC <code>filingDate</code> 是 SEC 文件申報日期，不一定完全等同市場實際 earnings announcement time。
+          </p>
+        </div>
+
+        <div class="bg-slate-900/70 p-4 rounded-xl border border-slate-800 flex items-start gap-3">
+          <span class="text-rose-400 font-bold text-base mt-0.5">2.</span>
+          <p class="text-xs md:text-sm text-slate-300 leading-relaxed">
+            目前沒有區分財報是在盤前或盤後發布。
+          </p>
+        </div>
+
+        <div class="bg-slate-900/70 p-4 rounded-xl border border-slate-800 flex items-start gap-3">
+          <span class="text-rose-400 font-bold text-base mt-0.5">3.</span>
+          <p class="text-xs md:text-sm text-slate-300 leading-relaxed">
+            每家公司近兩年約只有 8 次事件，樣本數有限。
+          </p>
+        </div>
+
+        <div class="bg-slate-900/70 p-4 rounded-xl border border-slate-800 flex items-start gap-3">
+          <span class="text-rose-400 font-bold text-base mt-0.5">4.</span>
+          <p class="text-xs md:text-sm text-slate-300 leading-relaxed">
+            本工具分析的是歷史事件後的價格反應，不能將歷史正報酬比例直接解讀為未來上漲機率。
+          </p>
+        </div>
+
+      </div>
+
+      <!-- Prominent Positioning Statement Banner -->
+      <div class="bg-gradient-to-r from-slate-900 via-cyan-950/40 to-slate-900 p-4 rounded-xl border border-cyan-700/40 text-center">
+        <span class="text-xs md:text-sm font-bold text-cyan-300 tracking-wide">
+          📌 本工具定位為歷史事件分析與資料探索工具，而非投資預測模型。
+        </span>
+      </div>
+    </section>
+
+
+    <!-- ================================================== -->
+    <!-- PART 10 ｜ 頁面最底部：收尾與 Repository 資訊 -->
+    <!-- ================================================== -->
+    <footer class="glass-card p-6 md:p-8 border-slate-800 text-center space-y-3">
+      <div class="text-base md:text-lg font-black text-white">
+        第二組 ｜ 美股半導體＋財報日 ｜ SEC EDGAR
+      </div>
+      <div class="text-xs md:text-sm text-slate-400 font-medium font-mono-code">
+        SEC EDGAR × Yahoo Finance × Python × Antigravity
+      </div>
+      <div class="pt-2">
+        <a href="https://github.com/Ryoma1022/G2" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-cyan-400 text-xs font-mono-code rounded-lg border border-slate-700 transition">
+          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
+          </svg>
+          https://github.com/Ryoma1022/G2
+        </a>
+      </div>
     </footer>
 
   </div>
 
-  <!-- SCRIPT LOGIC -->
+  <!-- SCRIPT LOGIC (Interactive Dashboard Functionality) -->
   <script>
     const eventsData = {events_json};
     const summaryData = {summary_json};
 
-    // Color definitions
     const colors = {{
       NVDA: '#10b981',
       AMD: '#f59e0b',
@@ -536,7 +760,6 @@ def build_dashboard_html() -> str:
       MU: '#ec4899',
     }};
 
-    // Helper: format badge
     function formatBadge(val) {{
       if (val === null || isNaN(val)) return '<span class="px-2 py-0.5 rounded badge-neutral">N/A</span>';
       const num = Number(val);
@@ -545,30 +768,28 @@ def build_dashboard_html() -> str:
       return `<span class="px-2 py-0.5 rounded font-semibold ${{cls}}">${{sign}}${{num.toFixed(2)}}%</span>`;
     }}
 
-    // Render Summary Table
     function renderSummaryTable() {{
       const tbody = document.getElementById('summaryTableBody');
       tbody.innerHTML = '';
       summaryData.forEach(row => {{
         const tr = document.createElement('tr');
-        tr.className = 'hover:bg-slate-800/40 transition';
+        tr.className = 'hover:bg-slate-800/50 transition';
         const color = colors[row.symbol] || '#ffffff';
         tr.innerHTML = `
           <td class="px-4 py-3 font-bold" style="color: ${{color}}">${{row.symbol}}</td>
-          <td class="px-4 py-3"><span class="px-2 py-0.5 bg-slate-800 rounded text-slate-300 text-xs font-mono">${{row.horizon}}</span></td>
-          <td class="px-4 py-3 text-right font-semibold text-white">${{row.median_abs_volatility_pct.toFixed(2)}}%</td>
-          <td class="px-4 py-3 text-right font-mono">${{formatBadge(row.mean_return_pct)}}</td>
-          <td class="px-4 py-3 text-right font-mono">${{formatBadge(row.median_return_pct)}}</td>
-          <td class="px-4 py-3 text-center text-xs font-mono"><span class="text-emerald-400 font-bold">${{row.up_count}}</span> / <span class="text-rose-400 font-bold">${{row.down_count}}</span></td>
-          <td class="px-4 py-3 text-right font-semibold ${{row.win_rate_pct >= 50 ? 'text-emerald-400' : 'text-rose-400'}}">${{row.win_rate_pct.toFixed(1)}}%</td>
-          <td class="px-4 py-3 text-right text-emerald-400 font-mono">+${{row.max_gain_pct.toFixed(2)}}%</td>
-          <td class="px-4 py-3 text-right text-rose-400 font-mono">${{row.max_loss_pct.toFixed(2)}}%</td>
+          <td class="px-4 py-3"><span class="px-2 py-0.5 bg-slate-800 rounded text-slate-300 text-xs font-mono-code font-bold">${{row.horizon}}</span></td>
+          <td class="px-4 py-3 text-right font-bold text-white font-mono-code">${{row.median_abs_volatility_pct.toFixed(2)}}%</td>
+          <td class="px-4 py-3 text-right font-mono-code">${{formatBadge(row.mean_return_pct)}}</td>
+          <td class="px-4 py-3 text-right font-mono-code">${{formatBadge(row.median_return_pct)}}</td>
+          <td class="px-4 py-3 text-center text-xs font-mono-code"><span class="text-emerald-400 font-bold">${{row.up_count}}</span> / <span class="text-rose-400 font-bold">${{row.down_count}}</span></td>
+          <td class="px-4 py-3 text-right font-bold font-mono-code ${{row.win_rate_pct >= 50 ? 'text-emerald-400' : 'text-rose-400'}}">${{row.win_rate_pct.toFixed(1)}}%</td>
+          <td class="px-4 py-3 text-right text-emerald-400 font-mono-code font-bold">+${{row.max_gain_pct.toFixed(2)}}%</td>
+          <td class="px-4 py-3 text-right text-rose-400 font-mono-code font-bold">${{row.max_loss_pct.toFixed(2)}}%</td>
         `;
         tbody.appendChild(tr);
       }});
     }}
 
-    // Render Events Table with Filters
     function renderEventsTable() {{
       const tbody = document.getElementById('eventsTableBody');
       const filterSymbol = document.getElementById('filterSymbol').value;
@@ -596,7 +817,7 @@ def build_dashboard_html() -> str:
 
       filtered.forEach(ev => {{
         const tr = document.createElement('tr');
-        tr.className = 'hover:bg-slate-800/50 transition';
+        tr.className = 'hover:bg-slate-800/60 transition';
         const color = colors[ev.symbol] || '#ffffff';
         tr.innerHTML = `
           <td class="px-4 py-2.5 font-bold" style="color: ${{color}}">${{ev.symbol}}</td>
@@ -607,13 +828,12 @@ def build_dashboard_html() -> str:
           <td class="px-4 py-2.5 text-right">${{formatBadge(ev.return_1d_pct)}}</td>
           <td class="px-4 py-2.5 text-right">${{formatBadge(ev.return_3d_pct)}}</td>
           <td class="px-4 py-2.5 text-right">${{formatBadge(ev.return_5d_pct)}}</td>
-          <td class="px-4 py-2.5 text-right text-white font-semibold">${{ev.abs_volatility_5d_pct.toFixed(2)}}%</td>
+          <td class="px-4 py-2.5 text-right text-white font-bold">${{ev.abs_volatility_5d_pct.toFixed(2)}}%</td>
         `;
         tbody.appendChild(tr);
       }});
     }}
 
-    // Setup Charts
     function initCharts() {{
       const symbols = ['AMD', 'INTC', 'MU', 'NVDA', 'QCOM'];
 
@@ -636,16 +856,16 @@ def build_dashboard_html() -> str:
           responsive: true,
           maintainAspectRatio: false,
           plugins: {{
-            legend: {{ labels: {{ color: '#94a3b8', font: {{ size: 11 }} }} }}
+            legend: {{ labels: {{ color: '#94a3b8', font: {{ size: 11, weight: 'bold' }} }} }}
           }},
           scales: {{
-            y: {{ grid: {{ color: '#334155' }}, ticks: {{ color: '#94a3b8', callback: v => v + '%' }} }},
-            x: {{ grid: {{ display: false }}, ticks: {{ color: '#f1f5f9', font: {{ weight: 'bold' }} }} }}
+            y: {{ grid: {{ color: '#1e293b' }}, ticks: {{ color: '#94a3b8', callback: v => v + '%' }} }},
+            x: {{ grid: {{ display: false }}, ticks: {{ color: '#f1f5f9', font: {{ weight: 'bold', size: 12 }} }} }}
           }}
         }}
       }});
 
-      // Chart 2: Positive Return Ratio (Win Rate)
+      // Chart 2: Positive Return Ratio
       const win1D = symbols.map(s => summaryData.find(d => d.symbol === s && d.horizon === '+1D').win_rate_pct);
       const win3D = symbols.map(s => summaryData.find(d => d.symbol === s && d.horizon === '+3D').win_rate_pct);
       const win5D = symbols.map(s => summaryData.find(d => d.symbol === s && d.horizon === '+5D').win_rate_pct);
@@ -664,11 +884,11 @@ def build_dashboard_html() -> str:
           responsive: true,
           maintainAspectRatio: false,
           plugins: {{
-            legend: {{ labels: {{ color: '#94a3b8', font: {{ size: 11 }} }} }}
+            legend: {{ labels: {{ color: '#94a3b8', font: {{ size: 11, weight: 'bold' }} }} }}
           }},
           scales: {{
-            y: {{ min: 0, max: 100, grid: {{ color: '#334155' }}, ticks: {{ color: '#94a3b8', callback: v => v + '%' }} }},
-            x: {{ grid: {{ display: false }}, ticks: {{ color: '#f1f5f9', font: {{ weight: 'bold' }} }} }}
+            y: {{ min: 0, max: 100, grid: {{ color: '#1e293b' }}, ticks: {{ color: '#94a3b8', callback: v => v + '%' }} }},
+            x: {{ grid: {{ display: false }}, ticks: {{ color: '#f1f5f9', font: {{ weight: 'bold', size: 12 }} }} }}
           }}
         }}
       }});
@@ -692,11 +912,11 @@ def build_dashboard_html() -> str:
           responsive: true,
           maintainAspectRatio: false,
           plugins: {{
-            legend: {{ labels: {{ color: '#94a3b8', font: {{ size: 11 }} }} }}
+            legend: {{ labels: {{ color: '#94a3b8', font: {{ size: 11, weight: 'bold' }} }} }}
           }},
           scales: {{
-            y: {{ grid: {{ color: '#334155' }}, ticks: {{ color: '#94a3b8', callback: v => v + '%' }} }},
-            x: {{ grid: {{ display: false }}, ticks: {{ color: '#f1f5f9', font: {{ weight: 'bold' }} }} }}
+            y: {{ grid: {{ color: '#1e293b' }}, ticks: {{ color: '#94a3b8', callback: v => v + '%' }} }},
+            x: {{ grid: {{ display: false }}, ticks: {{ color: '#f1f5f9', font: {{ weight: 'bold', size: 12 }} }} }}
           }}
         }}
       }});
@@ -716,9 +936,9 @@ def build_dashboard_html() -> str:
             ],
             borderColor: selectedSym === 'ALL' ? (colors[ev.symbol] || '#94a3b8') : (isUp ? '#34d399' : '#f87171'),
             backgroundColor: 'transparent',
-            borderWidth: 1.5,
+            borderWidth: 1.8,
             tension: 0.2,
-            pointRadius: 3,
+            pointRadius: 3.5,
           }};
         }});
 
@@ -737,8 +957,8 @@ def build_dashboard_html() -> str:
               legend: {{ display: selectedSym !== 'ALL', labels: {{ color: '#94a3b8', font: {{ size: 10 }} }} }}
             }},
             scales: {{
-              y: {{ grid: {{ color: '#334155' }}, ticks: {{ color: '#94a3b8', callback: v => v + '%' }} }},
-              x: {{ grid: {{ display: false }}, ticks: {{ color: '#f1f5f9', font: {{ weight: 'bold' }} }} }}
+              y: {{ grid: {{ color: '#1e293b' }}, ticks: {{ color: '#94a3b8', callback: v => v + '%' }} }},
+              x: {{ grid: {{ display: false }}, ticks: {{ color: '#f1f5f9', font: {{ weight: 'bold', size: 12 }} }} }}
             }}
           }}
         }});
@@ -750,13 +970,11 @@ def build_dashboard_html() -> str:
       }});
     }}
 
-    // Initialize on page load
     document.addEventListener('DOMContentLoaded', () => {{
       renderSummaryTable();
       renderEventsTable();
       initCharts();
 
-      // Attach filter listeners
       document.getElementById('filterSymbol').addEventListener('change', renderEventsTable);
       document.getElementById('filterForm').addEventListener('change', renderEventsTable);
       document.getElementById('filterSearch').addEventListener('input', renderEventsTable);
@@ -772,15 +990,13 @@ def export_dashboard():
     html = build_dashboard_html()
     os.makedirs(os.path.dirname(OUTPUT_HTML_PATH), exist_ok=True)
 
-    # Save to outputs/dashboard.html
     with open(OUTPUT_HTML_PATH, "w", encoding="utf-8") as f:
         f.write(html)
-    print(f"[+] Saved interactive HTML dashboard to: {OUTPUT_HTML_PATH}")
+    print(f"[+] Saved interactive HTML presentation dashboard to: {OUTPUT_HTML_PATH}")
 
-    # Also save to root dashboard.html for easy one-click access
     with open(ROOT_HTML_PATH, "w", encoding="utf-8") as f:
         f.write(html)
-    print(f"[+] Saved root interactive dashboard to: {ROOT_HTML_PATH}")
+    print(f"[+] Saved root interactive presentation dashboard to: {ROOT_HTML_PATH}")
 
 
 if __name__ == "__main__":
