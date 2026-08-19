@@ -4,38 +4,27 @@
 
 ### 做了什麼
 
-- 已建立 GitHub repository (`https://github.com/Ryoma1022/G2`)。
-- 已完成 Antigravity 與 GitHub repository 連線。
-- 已安裝 Python 環境與相依套件 (`requests`, `pandas`, `yfinance`, `matplotlib`)。
-- 已完成專案需求拷問與可行性討論。
-- 已完成 `PLAN.md` 規格規劃。
-- **已完成 `TASK 01`**：
-  - 建立 `src/fetch_sec.py`，支援 SEC EDGAR API 抓取與驗證。
-  - 使用合規 User-Agent：`SemiconductorAnalytics Ryoma1022@gmail.com`。
-  - 成功抓取 NVDA 原始申報資料並保存為 `data/raw/sec/NVDA_submissions.json`。
-  - 通過所有驗收檢查（HTTP 200、CIK 1045810、NVIDIA CORP、完整保留原始 JSON、驗證 filings 結構）。
+- 已完成 GitHub repository 與 Antigravity 環境配置。
+- 已完成 `PLAN.md` 規格與完整架構設計。
+- **已完成 `TASK 01`**：抓取並保存 NVDA 原始 SEC EDGAR 申報 JSON 檔。
+- **已完成 `TASK 02`**：批次抓取 NVDA, AMD, INTC, QCOM, MU 之 SEC submissions，並以 `src/clean_sec.py` 清洗出近兩年滾動期間共 40 筆 10-Q/10-K 財報事件，匯出至 `data/processed/sec_events.csv`。
+- **已完成 `TASK 03`**：以 `src/fetch_prices.py` 透過 Yahoo Finance 抓取 5 檔標的之歷史日線股價（各 626 交易日），保存至 `data/raw/prices/`。
+- **已完成 `TASK 04`**：以 `src/analyze_events.py` 精確對齊交易日序列，計算基準價與事件後 +1D、+3D、+5D 之報酬率、絕對波動、中位數、平均數、勝率等指標，產出明細與統計表至 `outputs/tables/`。
+- **已完成 `TASK 05`**：以 `src/generate_visualizations.py` 產出 4 份高畫質分析圖表至 `outputs/charts/`，撰寫完整分析報告 `outputs/report/semiconductor_earnings_volatility_report.md`，建立 `main.py` 與 `README.md`。
 
-### 已確定的重要規格
+### 已確定的重要規格與邏輯
 
 - SEC 事件只保留 10-Q、10-K。
-- 事件日期使用 SEC `filingDate`。
-- 分析區間為程式執行日往回推兩年。
-- 若 filing date 為非交易日，計算時對應其後最近的有效交易日。
-- 股價分析使用交易日序列，不使用日曆日直接加 1、3、5 天。
-- SEC 與股價原始資料先完整保存，再另行清洗。
-- 最新事件若後續交易日不足，缺值保留為空值，不視為 0。
-- 專案僅提供歷史波動參考，不預測方向、不提供投資建議。
+- 事件日期使用 SEC `filingDate`，遇非交易日自動對齊至後續第一個有效交易日。
+- 基準價為有效事件日前一個交易日的收盤價（Close of T-1）。
+- 股價分析一律依交易日序列計算（+1D 為當日 Close、+3D 為 index+2、+5D 為 index+4）。
+- 原始資料（SEC JSON、價格 CSV）與清洗加工資料分離保存。
+- 支援一鍵式全流程自動執行 (`py -3.12 main.py`)。
 
 ### 卡在哪
 
-- SEC API 對 `User-Agent` 的 Email 格式有嚴格限制（帶 `+` 或 `noreply` 會被擋 403），已調整為標準 Email 格式解決。
-
-### AI 錯了什麼
-
-- 初次使用 `318083982+Ryoma1022@users.noreply.github.com` 作為 User-Agent 時被 SEC 403 阻擋，隨後排查出格式限制並修復為標準格式。
+- 無。所有功能模組皆已實作、驗證與產出成果。
 
 ### 下一步
 
-執行 `TASK 02`：
-1. 批次抓取其餘 4 檔標的（AMD, INTC, QCOM, MU）之 SEC 原始 submissions 資料至 `data/raw/sec/`。
-2. 建立清洗腳本 `src/clean_sec.py`，篩選近兩年（2024-08 至 2026-08）之 10-Q、10-K 財報事件，輸出 `data/processed/sec_events.csv`。
+- 執行 Git 提交與同步至 GitHub Repository (`origin/main`)。

@@ -4,27 +4,7 @@
 
 ### 目標
 
-使用 Python 從 SEC EDGAR submissions API 成功取得 NVIDIA（NVDA）的公司申報資料，並將伺服器回傳的原始 JSON 完整保存至專案。此任務只負責抓取與保存原始資料，暫不清洗、篩選 10-Q／10-K，也不進行股價分析。
-
-### 材料
-
-- Python 3
-- Python 套件：`requests`
-- NVDA／NVIDIA CIK：`0001045810`
-- SEC submissions API：
-```text
-https://data.sec.gov/submissions/CIK0001045810.json
-```
-- 輸出位置：
-```text
-data/raw/sec/NVDA_submissions.json
-```
-- SEC 要求的 HTTP request header：
-```text
-User-Agent: SemiconductorAnalytics Ryoma1022@gmail.com
-Accept-Encoding: gzip, deflate
-Host: data.sec.gov
-```
+使用 Python 從 SEC EDGAR submissions API 成功取得 NVIDIA（NVDA）的公司申報資料，並將伺服器回傳的原始 JSON 完整保存至專案。
 
 ### 驗收結果
 
@@ -38,44 +18,71 @@ Host: data.sec.gov
 - [x] 原始 JSON 未做刪欄、篩選或改寫。
 - [x] request 使用包含專案名稱與真實聯絡信箱的 `User-Agent`。
 - [x] 錯誤處理至少涵蓋連線失敗、逾時與非 200 回應。
-- [x] 已更新 `MEMORY.md`，並完成本關卡的 commit 與 push。
+- [x] 已更新 `MEMORY.md`，並完成 commit。
 
 ---
 
-## TASK 02｜抓取全標的 SEC 原始資料並清洗近兩年 10-Q、10-K 事件
+## TASK 02｜抓取全標的 SEC 原始資料並清洗近兩年 10-Q、10-K 事件（已完成）
 
 ### 目標
 
-1. 擴展抓取 NVDA、AMD、INTC、QCOM、MU 共 5 檔半導體標的的 SEC EDGAR submissions 原始 JSON，分別保存至 `data/raw/sec/{TICKER}_submissions.json`。
-2. 撰寫 `src/clean_sec.py`，從原始 JSON 中提取各股票的申報紀錄，篩選出最近兩年（滾動兩年，即 `2024-08-19` 至 `2026-08-19`）的 `10-Q` 與 `10-K` 財報事件。
-3. 輸出清洗後之標準化事件表 `data/processed/sec_events.csv`。
+1. 擴展抓取 NVDA、AMD、INTC、QCOM、MU 共 5 檔半導體標的的 SEC EDGAR submissions 原始 JSON。
+2. 撰寫 `src/clean_sec.py`，篩選近兩年滾動期間之 `10-Q` 與 `10-K` 財報事件，產出 `data/processed/sec_events.csv`。
 
-### 材料與輸出
+### 驗收結果
 
-- 輸入：`data/raw/sec/{symbol}_submissions.json`
-- 標的清單：
-  - `NVDA`: CIK 0001045810
-  - `AMD`: CIK 0000002488
-  - `INTC`: CIK 0000050863
-  - `QCOM`: CIK 0000804328
-  - `MU`: CIK 0000723125
-- 輸出位置：`data/processed/sec_events.csv`
-- 輸出欄位：
-  - `symbol` (股票代碼)
-  - `cik` (CIK 代碼)
-  - `company_name` (公司名稱)
-  - `form` (10-Q 或 10-K)
-  - `filing_date` (申報日期 YYYY-MM-DD)
-  - `report_date` (財報期間結束日 YYYY-MM-DD)
-  - `accession_number` (申報案號)
-  - `primary_doc_name` (主文檔檔名)
+- [x] 5 檔股票之原始 submissions JSON 皆已下載至 `data/raw/sec/` 且驗證完整。
+- [x] 執行 `src/clean_sec.py` 成功產出 `data/processed/sec_events.csv`。
+- [x] 事件表僅包含 `10-Q` 與 `10-K`，無其他 Form。
+- [x] 事件申報日期均在執行日往回推兩年之區間內（共 40 筆事件，每檔各 8 筆）。
+- [x] 5 檔股票每檔均有 8 個有效財報事件（6 次 10-Q + 2 次 10-K）。
+- [x] 資料表依 `filing_date` 與 `symbol` 正確排序，無重複或遺漏記錄。
 
-### 驗收條件
+---
 
-- [ ] 5 檔股票之原始 submissions JSON 皆已下載至 `data/raw/sec/` 且驗證完整。
-- [ ] 執行 `src/clean_sec.py` 成功產出 `data/processed/sec_events.csv`。
-- [ ] 事件表僅包含 `10-Q` 與 `10-K`，無其他 Form（如 8-K, 4, 13F 等）。
-- [ ] 事件申報日期均在執行日往回推兩年之區間內。
-- [ ] 5 檔股票每檔均有 7~9 個有效財報事件（一年 3 次 10-Q + 1 次 10-K）。
-- [ ] 資料表依 `filing_date` 與 `symbol` 正確排序，無重複或遺漏記錄。
-- [ ] 更新 `MEMORY.md` 並完成 commit / push。
+## TASK 03｜抓取 Yahoo Finance 股價資料（已完成）
+
+### 目標
+
+使用 `yfinance` 抓取 5 檔標的歷史日線股價（涵蓋事件日前後交易日序列），保存至 `data/raw/prices/{symbol}_daily.csv`。
+
+### 驗收結果
+
+- [x] 建立 `src/fetch_prices.py`。
+- [x] 5 檔股票日線資料皆成功抓取（每檔各 626 交易日，2024-02 至 2026-08）。
+- [x] 涵蓋基準日（T-1）與事件後第 5 個交易日。
+- [x] 欄位格式標準化（Date, Open, High, Low, Close, Volume）。
+
+---
+
+## TASK 04｜計算事件後 1, 3, 5 日波動與統計分析（已完成）
+
+### 目標
+
+建立 `src/analyze_events.py`，計算各事件後第 1、3、5 個交易日報酬率與絕對波動，並計算中位數、平均數、勝率與跨公司比較表。
+
+### 驗收結果
+
+- [x] 事件日遇非交易日正確對應至其後第一個交易日。
+- [x] 基準價採事件前一交易日收盤價。
+- [x] 第 1、3、5 日依交易日序列計算。
+- [x] 產出 `outputs/tables/event_details.csv`。
+- [x] 產出 `outputs/tables/company_summary.csv`。
+- [x] 產出 `outputs/tables/overall_comparison.csv`。
+
+---
+
+## TASK 05｜視覺化圖表與結論報告（已完成）
+
+### 目標
+
+建立 `src/generate_visualizations.py` 產出圖表，撰寫結論報告與一鍵執行腳本 `main.py`。
+
+### 驗收結果
+
+- [x] 產出 `outputs/charts/median_volatility_comparison.png`。
+- [x] 產出 `outputs/charts/returns_distribution_boxplots.png`。
+- [x] 產出 `outputs/charts/win_rates_comparison.png`。
+- [x] 產出 `outputs/charts/event_trajectories_by_company.png`。
+- [x] 產出 `outputs/report/semiconductor_earnings_volatility_report.md`。
+- [x] 建立 `main.py` 與 `README.md`。

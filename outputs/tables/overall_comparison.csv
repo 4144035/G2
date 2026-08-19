@@ -1,0 +1,6 @@
+symbol,+1D_median_abs_volatility_pct,+3D_median_abs_volatility_pct,+5D_median_abs_volatility_pct,+1D_mean_return_pct,+3D_mean_return_pct,+5D_mean_return_pct,+1D_win_rate_pct,+3D_win_rate_pct,+5D_win_rate_pct
+AMD,6.73,8.39,10.16,-3.1,-2.55,-0.82,37.5,25.0,37.5
+INTC,7.26,10.16,9.75,-1.22,-2.36,2.38,25.0,37.5,25.0
+MU,5.91,8.9,8.12,-0.04,-0.5,-1.55,50.0,50.0,37.5
+NVDA,1.36,2.92,6.38,0.72,-3.51,-5.83,50.0,0.0,12.5
+QCOM,2.92,5.75,3.13,1.23,-1.56,0.47,75.0,25.0,25.0
