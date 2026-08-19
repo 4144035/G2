@@ -19,6 +19,7 @@ from clean_sec import clean_and_export_sec_events
 from fetch_prices import fetch_historical_prices
 from analyze_events import run_full_analysis
 from generate_visualizations import generate_all_charts
+from generate_dashboard import export_dashboard
 
 
 def run_pipeline():
@@ -39,6 +40,9 @@ def run_pipeline():
     print("\n>>> STEP 5: Generating Visualization Charts...")
     generate_all_charts()
 
+    print("\n>>> STEP 6: Generating Interactive HTML Dashboard...")
+    export_dashboard()
+
     elapsed = time.time() - start_time
     print("\n" + "=" * 70)
     print(f" [+] Pipeline execution finished successfully in {elapsed:.2f} seconds!")
@@ -48,6 +52,7 @@ def run_pipeline():
     print("   - Raw Prices:         data/raw/prices/")
     print("   - Statistical Tables: outputs/tables/")
     print("   - Visual Charts:      outputs/charts/")
+    print("   - HTML Dashboard:     dashboard.html & outputs/dashboard.html")
     print("=" * 70)
 
 
