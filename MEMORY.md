@@ -4,16 +4,16 @@
 
 ### 做了什麼
 
-- 已建立 GitHub repository。
+- 已建立 GitHub repository (`https://github.com/Ryoma1022/G2`)。
 - 已完成 Antigravity 與 GitHub repository 連線。
-- 已安裝 Python 環境。
+- 已安裝 Python 環境與相依套件 (`requests`, `pandas`, `yfinance`, `matplotlib`)。
 - 已完成專案需求拷問與可行性討論。
-- 已完成 `PLAN.md`。
-- 已建立第一張任務 `TASK 01`。
-- 已確定分析標的為 NVDA、AMD、INTC、QCOM、MU。
-- 已確定使用 SEC EDGAR 財報申報資料與 Yahoo Finance 日線股價。
-- 已確定分析財報事件後第 1、3、5 個交易日的波動。
-- 已確定以中位數為主要參考、平均數為輔助，並保留正負報酬及漲跌比例。
+- 已完成 `PLAN.md` 規格規劃。
+- **已完成 `TASK 01`**：
+  - 建立 `src/fetch_sec.py`，支援 SEC EDGAR API 抓取與驗證。
+  - 使用合規 User-Agent：`SemiconductorAnalytics Ryoma1022@gmail.com`。
+  - 成功抓取 NVDA 原始申報資料並保存為 `data/raw/sec/NVDA_submissions.json`。
+  - 通過所有驗收檢查（HTTP 200、CIK 1045810、NVIDIA CORP、完整保留原始 JSON、驗證 filings 結構）。
 
 ### 已確定的重要規格
 
@@ -28,13 +28,14 @@
 
 ### 卡在哪
 
-目前無。
+- SEC API 對 `User-Agent` 的 Email 格式有嚴格限制（帶 `+` 或 `noreply` 會被擋 403），已調整為標準 Email 格式解決。
 
 ### AI 錯了什麼
 
-目前無。
+- 初次使用 `318083982+Ryoma1022@users.noreply.github.com` 作為 User-Agent 時被 SEC 403 阻擋，隨後排查出格式限制並修復為標準格式。
 
 ### 下一步
 
-執行 `TASK 01`：使用 SEC EDGAR submissions API 抓取 NVDA 原始資料，保存為 `data/raw/sec/NVDA_submissions.json`，完成驗收後更新本檔案並 commit、push。
-
+執行 `TASK 02`：
+1. 批次抓取其餘 4 檔標的（AMD, INTC, QCOM, MU）之 SEC 原始 submissions 資料至 `data/raw/sec/`。
+2. 建立清洗腳本 `src/clean_sec.py`，篩選近兩年（2024-08 至 2026-08）之 10-Q、10-K 財報事件，輸出 `data/processed/sec_events.csv`。
